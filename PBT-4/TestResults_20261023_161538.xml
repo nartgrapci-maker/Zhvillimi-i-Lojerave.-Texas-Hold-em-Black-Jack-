@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="15" result="Passed" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.1434682">
+  <test-suite type="TestSuite" id="1033" name="DEMO" fullname="DEMO" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.143468" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1017" name="PokerDemo.Tests.dll" fullname="C:/Users/Nart/DEMO/Library/ScriptAssemblies/PokerDemo.Tests.dll" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.115473" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="7048" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1018" name="PokerDemo" fullname="PokerDemo" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.100976" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1019" name="Tests" fullname="PokerDemo.Tests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.087681" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="LevelSolutionTests" fullname="PokerDemo.Tests.LevelSolutionTests" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.085889" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1004" name="AllLevels_AreWellFormed" fullname="PokerDemo.Tests.LevelSolutionTests.AllLevels_AreWellFormed" methodname="AllLevels_AreWellFormed" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="488947576" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.029044" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="Blackjack_HittingOnSeventeen_Busts" fullname="PokerDemo.Tests.LevelSolutionTests.Blackjack_HittingOnSeventeen_Busts" methodname="Blackjack_HittingOnSeventeen_Busts" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1304597442" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.008059" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1015" name="Blackjack_PerfectRun_Is135Chips" fullname="PokerDemo.Tests.LevelSolutionTests.Blackjack_PerfectRun_Is135Chips" methodname="Blackjack_PerfectRun_Is135Chips" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="227512333" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.000900" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="DuplicateCard_IsALevelDefect_NotAPlayerLoss" fullname="PokerDemo.Tests.LevelSolutionTests.DuplicateCard_IsALevelDefect_NotAPlayerLoss" methodname="DuplicateCard_IsALevelDefect_NotAPlayerLoss" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1054910071" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.002737" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="Evaluator_NamesHands" fullname="PokerDemo.Tests.LevelSolutionTests.Evaluator_NamesHands" methodname="Evaluator_NamesHands" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1492176102" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.001685" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="Evaluator_Ordering" fullname="PokerDemo.Tests.LevelSolutionTests.Evaluator_Ordering" methodname="Evaluator_Ordering" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1394685353" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.001509" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1008" name="Level1_BetBelowMinimumRaise_IsRefused" fullname="PokerDemo.Tests.LevelSolutionTests.Level1_BetBelowMinimumRaise_IsRefused" methodname="Level1_BetBelowMinimumRaise_IsRefused" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="293261185" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.002975" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="Level1_FoldingPreflop_Fails" fullname="PokerDemo.Tests.LevelSolutionTests.Level1_FoldingPreflop_Fails" methodname="Level1_FoldingPreflop_Fails" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="2048450411" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.002346" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="Level1_Solution_WinsWithThreeJacks" fullname="PokerDemo.Tests.LevelSolutionTests.Level1_Solution_WinsWithThreeJacks" methodname="Level1_Solution_WinsWithThreeJacks" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="109446626" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.001778" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="Level2_CallingTheRiverBet_LosesToThreeQueens" fullname="PokerDemo.Tests.LevelSolutionTests.Level2_CallingTheRiverBet_LosesToThreeQueens" methodname="Level2_CallingTheRiverBet_LosesToThreeQueens" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="608208456" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.001306" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="Level2_OverbettingEarly_LosesEverything" fullname="PokerDemo.Tests.LevelSolutionTests.Level2_OverbettingEarly_LosesEverything" methodname="Level2_OverbettingEarly_LosesEverything" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1253376274" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.000511" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="Level2_Solution_FoldingToTheRiverBet_KeepsSixtyChips" fullname="PokerDemo.Tests.LevelSolutionTests.Level2_Solution_FoldingToTheRiverBet_KeepsSixtyChips" methodname="Level2_Solution_FoldingToTheRiverBet_KeepsSixtyChips" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="1623554894" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.000477" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="Level3_FlopHasTwelveOuts" fullname="PokerDemo.Tests.LevelSolutionTests.Level3_FlopHasTwelveOuts" methodname="Level3_FlopHasTwelveOuts" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="61356910" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.001849" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1013" name="Level3_FoldingTheFlop_Fails" fullname="PokerDemo.Tests.LevelSolutionTests.Level3_FoldingTheFlop_Fails" methodname="Level3_FoldingTheFlop_Fails" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="477660372" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.000567" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="Level3_Solution_CallTheDrawAndWinWithBroadway" fullname="PokerDemo.Tests.LevelSolutionTests.Level3_Solution_CallTheDrawAndWinWithBroadway" methodname="Level3_Solution_CallTheDrawAndWinWithBroadway" classname="PokerDemo.Tests.LevelSolutionTests" runstate="Runnable" seed="39389996" result="Passed" start-time="2026-10-23 14:15:32Z" end-time="2026-10-23 14:15:32Z" duration="0.000519" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/Nart/AppData/LocalLow/DefaultCompany/DEMO\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
