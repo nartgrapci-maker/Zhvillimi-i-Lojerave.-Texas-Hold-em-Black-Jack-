@@ -40,6 +40,7 @@ public class AvatarView : MonoBehaviour
     GameObject _ring;
     float _seed, _bubbleUntil;
     bool _ambient;
+    Renderer _visR;            // the biggest part of an ambient person: when it is off screen, the person stops animating
 
     // arms: shoulder and elbow pivots (0 = left, 1 = right); the right hand holds a glass of tea, the left one a cigarette
     readonly Transform[] _shoulder = new Transform[2];
@@ -312,10 +313,14 @@ public class AvatarView : MonoBehaviour
         _ambient = true;
         AutoLife = true;
         if (_label != null) _label.gameObject.SetActive(false);
+        MeshKit.MakeLowPoly(gameObject);          // the other tables are never seen up close
+        float biggest = -1f;
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.receiveShadows = false;
+            float s = r.bounds.size.sqrMagnitude;
+            if (s > biggest && r.GetComponent<TextMesh>() == null) { biggest = s; _visR = r; }
         }
     }
 
@@ -455,6 +460,8 @@ public class AvatarView : MonoBehaviour
 
     void Update()
     {
+        // the people at the other tables only move while somebody can see them (a third of the room is behind you)
+        if (_ambient && _visR != null && !_visR.isVisible) return;
         float t = Time.time + _seed;
         if (_ambient) CurrentMood = AmbientMood(t);
         float bob = Mathf.Sin(t * 1.7f) * 0.012f;
@@ -483,6 +490,7 @@ public class AvatarView : MonoBehaviour
 
     void LateUpdate()
     {
+        if (_ambient) return;                 // no label to turn
         if (CameraT != null && _label != null)
         {
             _label.rotation = CameraT.rotation;

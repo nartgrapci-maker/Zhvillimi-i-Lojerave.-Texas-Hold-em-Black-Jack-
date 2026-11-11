@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Smooth meshes made at runtime. Unity's built-in cylinder (20 sides) and sphere look faceted on a big table, so
-/// the game swaps them for these (same size: radius 0.5, cylinder height 2, capsule height 2) with 64 sides and smooth
+/// the game swaps them for these (same size: radius 0.5, cylinder height 2, capsule height 2) with 40-72 sides and smooth
 /// normals. Everything is built by revolving a small profile around the Y axis.
 /// </summary>
 public static class MeshKit
@@ -12,9 +12,31 @@ public static class MeshKit
     static readonly Dictionary<string, Mesh> _tori = new Dictionary<string, Mesh>();
 
     public static Mesh Cylinder { get { if (_cylinder == null) _cylinder = BuildCylinder(72); return _cylinder; } }
-    public static Mesh Sphere { get { if (_sphere == null) _sphere = BuildSphere(64, 32); return _sphere; } }
-    public static Mesh Cone { get { if (_cone == null) _cone = BuildCone(72); return _cone; } }
-    public static Mesh Capsule { get { if (_capsule == null) _capsule = BuildCapsule(48, 14); return _capsule; } }
+    public static Mesh Sphere { get { if (_sphere == null) _sphere = BuildSphere(40, 20); return _sphere; } }
+    public static Mesh Cone { get { if (_cone == null) _cone = BuildCone(48); return _cone; } }
+    public static Mesh Capsule { get { if (_capsule == null) _capsule = BuildCapsule(32, 10); return _capsule; } }
+
+    // low-poly versions for things that are always far away or tiny on screen (the backdrop, the other tables):
+    // a 64 x 32 sphere has ~2000 vertices, and a backdrop has hundreds of stars, lanterns and leaves
+    static Mesh _cylinderLo, _sphereLo, _capsuleLo, _coneLo;
+    public static Mesh CylinderLo { get { if (_cylinderLo == null) _cylinderLo = BuildCylinder(18); return _cylinderLo; } }
+    public static Mesh SphereLo { get { if (_sphereLo == null) _sphereLo = BuildSphere(16, 10); return _sphereLo; } }
+    public static Mesh ConeLo { get { if (_coneLo == null) _coneLo = BuildCone(16); return _coneLo; } }
+    public static Mesh CapsuleLo { get { if (_capsuleLo == null) _capsuleLo = BuildCapsule(14, 5); return _capsuleLo; } }
+
+    /// <summary>Swaps every smooth mesh under root for its low-poly version.</summary>
+    public static void MakeLowPoly(GameObject root)
+    {
+        foreach (MeshFilter mf in root.GetComponentsInChildren<MeshFilter>(true))
+        {
+            Mesh m = mf.sharedMesh;
+            if (m == null) continue;
+            if (m == _sphere) mf.sharedMesh = SphereLo;
+            else if (m == _cylinder) mf.sharedMesh = CylinderLo;
+            else if (m == _capsule) mf.sharedMesh = CapsuleLo;
+            else if (m == _cone) mf.sharedMesh = ConeLo;
+        }
+    }
 
     /// <summary>A ring (donut) with the given centre-line radius and tube radius, e.g. a rounded table edge.</summary>
     public static Mesh Torus(float radius, float tube)

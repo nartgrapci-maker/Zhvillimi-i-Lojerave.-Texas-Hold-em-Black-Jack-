@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Esc (or the Menu button) opens a small pause card: continue, back to the main menu, or quit to the desktop.
+/// Esc (or the Menu button) opens a small pause card: continue, back to the main menu, or quit to the desktop
+/// (over the main menu itself: continue or quit).
 /// While it is open the game stands still (Time.timeScale 0).
 /// </summary>
 public partial class Game3D
@@ -24,11 +25,7 @@ public partial class Game3D
 #endif
     }
 
-    void TogglePause()
-    {
-        if (_mode == Mode.Menu && !_paused) return;      // the main menu has its own "Dil" button
-        SetPaused(!_paused);
-    }
+    void TogglePause() { SetPaused(!_paused); }
 
     void SetPaused(bool on)
     {
@@ -36,7 +33,21 @@ public partial class Game3D
         _paused = on;
         if (on) _timeScale0 = Time.timeScale > 0f ? Time.timeScale : 1f;
         Time.timeScale = on ? 0f : _timeScale0;
-        if (_pausePanel != null) _pausePanel.SetActive(on);
+        if (_pausePanel == null) return;
+        _pausePanel.SetActive(on);
+        ClearSelection();                 // Tab starts fresh on the card; closing it leaves nothing selected behind
+        if (!on) return;
+        // over the main menu there is no menu to go back to: just continue or quit
+        bool menu = _mode == Mode.Menu;
+        _pauseMenu.Go.SetActive(!menu);
+        PlacePause(_pauseQuit, menu ? 0.36f : 0.14f);
+    }
+
+    static void PlacePause(UiBtn b, float y0)
+    {
+        var rt = (RectTransform)b.Go.transform;
+        rt.anchorMin = V(0.08f, y0);
+        rt.anchorMax = V(0.92f, y0 + 0.18f);
     }
 
     void QuitApp()
@@ -65,6 +76,19 @@ public partial class Game3D
         _pauseContinue = NewButton(c, "Vazhdo", V(0.08f, 0.58f), V(0.92f, 0.76f), delegate { SetPaused(false); }, new Color(0.12f, 0.42f, 0.28f), 18);
         _pauseMenu = NewButton(c, "Kthehu te menuja", V(0.08f, 0.36f), V(0.92f, 0.54f), delegate { SetPaused(false); ShowMenu(); }, new Color(0.17f, 0.28f, 0.45f), 18);
         _pauseQuit = NewButton(c, "Dil nga aplikacioni", V(0.08f, 0.14f), V(0.92f, 0.32f), delegate { QuitApp(); }, new Color(0.62f, 0.10f, 0.17f), 18);
+        foreach (UiBtn b in new[] { _pauseContinue, _pauseMenu, _pauseQuit }) Glow(b.B);
         _pausePanel.SetActive(false);
+    }
+
+    /// <summary>The button selected with Tab (or under the mouse) gets ~40% brighter; at rest it looks as before.</summary>
+    static void Glow(Button b)
+    {
+        ColorBlock cb = b.colors;
+        cb.colorMultiplier = 1.4f;
+        cb.normalColor = new Color(0.714f, 0.714f, 0.714f, 1f);
+        cb.highlightedColor = Color.white;
+        cb.selectedColor = Color.white;
+        cb.pressedColor = new Color(0.55f, 0.55f, 0.55f, 1f);
+        b.colors = cb;
     }
 }

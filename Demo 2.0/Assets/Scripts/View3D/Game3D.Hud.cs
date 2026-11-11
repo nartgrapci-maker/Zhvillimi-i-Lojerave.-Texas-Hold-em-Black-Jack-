@@ -22,7 +22,7 @@ public partial class Game3D
     }
 
     GameObject _hudRoot;
-    Text _infoT, _logT, _tipsT, _bannerT, _amountT, _bfAmountT, _eqT, _cityT, _mapT;
+    Text _infoT, _logT, _tipsT, _bannerT, _amountT, _bfAmountT, _eqT, _cityT;
     GameObject _menuPanel, _infoPanel, _logPanel, _tipsPanel, _bannerPanel, _eqPanel, _cityPanel;
     GameObject _topBar, _barPlay, _betPanel, _barOver, _barBj, _barBf, _gBfBet, _gBfPlay;
     RectTransform _eqFill;
@@ -213,7 +213,7 @@ public partial class Game3D
         _bBfStand = NewButton(_gBfPlay.transform, "Qëndro", V(0.38f, 0.02f), V(0.50f, 0.12f), delegate { OnBfStand(); }, blue, 17);
         _bBfDouble = NewButton(_gBfPlay.transform, "Dyfisho", V(0.51f, 0.02f), V(0.64f, 0.12f), delegate { OnBfDouble(); }, violet, 17);
         _bBfHint = NewButton(_gBfPlay.transform, "Ndihmë", V(0.65f, 0.02f), V(0.74f, 0.12f), delegate { _bfHint = true; RefreshHud(); }, gold, 16);
-        _bBfRestart = NewButton(_barBf.transform, "Fillo përsëri", V(0.38f, 0.02f), V(0.62f, 0.12f), delegate { StartBjFree(); }, red, 18);
+        _bBfRestart = NewButton(_barBf.transform, "Fillo përsëri", V(0.36f, 0.02f), V(0.64f, 0.12f), delegate { OnBfRestart(); }, red, 18);
 
         // the card that introduces a city of the tournament
         _cityPanel = NewPanel(h, "CityCard", V(0.30f, 0.12f), V(0.70f, 0.88f), new Color(0.05f, 0.01f, 0.03f, 0.88f)).gameObject;
@@ -223,113 +223,13 @@ public partial class Game3D
         _cityT = NewLabel(cp, "Text", V(0.04f, 0.21f), V(0.96f, 0.66f), 16, TextAnchor.MiddleCenter);
         _bCityGo = NewButton(cp, "Fillo", V(0.25f, 0.04f), V(0.75f, 0.17f), delegate { OnCityStart(); }, red, 22);
 
-        // main menu: a card on the left (the room stays visible on the right), game modes as cards, the map chooser at the bottom
-        _menuPanel = NewPanel(h, "Menu", V(0.025f, 0.035f), V(0.505f, 0.965f), new Color(0.06f, 0.025f, 0.035f, 0.90f)).gameObject;
-        Transform m = _menuPanel.transform;
-        Gold(m, V(0f, 0f), V(1f, 0.004f)); Gold(m, V(0f, 0.996f), V(1f, 1f)); Gold(m, V(0f, 0f), V(0.0025f, 1f)); Gold(m, V(0.9975f, 0f), V(1f, 1f));
-        NewRaw(m, "Strip", V(0.025f, 0.925f), V(0.975f, 0.975f), Theme.Strip, Color.white, new Rect(0f, 0f, 0.62f, 1f));
-        NewRaw(m, "Eagle", V(0.045f, 0.815f), V(0.165f, 0.915f), Theme.Eagle, Theme.Gold, new Rect(0f, 0f, 1f, 1f));
-        Text title = NewLabel(m, "Title", V(0.17f, 0.835f), V(0.975f, 0.925f), 38, TextAnchor.MiddleLeft);
-        title.text = "<b>POKER & BLACKJACK</b>";
-        Text sub = NewLabel(m, "Sub", V(0.17f, 0.795f), V(0.975f, 0.845f), 15, TextAnchor.MiddleLeft);
-        sub.text = "Edicioni shqiptar  ·  Teksas Hold'em dhe Blackjack";
-        sub.color = new Color(0.95f, 0.78f, 0.35f);
-        Text welcome = NewLabel(m, "Welcome", V(0.045f, 0.745f), V(0.955f, 0.80f), 13, TextAnchor.MiddleLeft);
-        welcome.text = "<i>" + Sq.Welcome + "</i>";
-        welcome.color = new Color(0.86f, 0.80f, 0.72f);
-
-        Section(m, "LOJA", 0.715f);
-        Color cRed = new Color(0.78f, 0.16f, 0.24f), cGreen = new Color(0.20f, 0.62f, 0.40f), cBlue = new Color(0.30f, 0.48f, 0.80f);
-        Color cViolet = new Color(0.62f, 0.42f, 0.86f), cGrey = new Color(0.62f, 0.60f, 0.66f);
-        string[] mTitle = new string[8], mSub = new string[8];
-        mTitle[0] = "Udhëtimi nëpër Shqipëri"; mSub[0] = "Turne me 4 qytete";
-        mTitle[1] = "Loja e lirë"; mSub[1] = "Ti kundër 3 botëve";
-        for (int i = 0; i < Levels.All.Length; i++)
-        {
-            mTitle[2 + i] = "Niveli " + Levels.All[i].Number;
-            mSub[2 + i] = Sq.Level(Levels.All[i].Number).Title;
-        }
-        mTitle[5] = "Blackjack i lirë"; mSub[5] = "Bast, dyfisho, ndihmë";
-        mTitle[6] = "Blackjack i programuar"; mSub[6] = "3 duar mësimi";
-        mTitle[7] = "Prototipi 2D"; mSub[7] = "Kthehu te versioni 2D";
-        Color[] mAccent = { cRed, cGreen, cBlue, cBlue, cBlue, cViolet, cViolet, cGrey };
-        UnityAction[] actions =
-        {
-            delegate { StartTournament(); },
-            delegate { StartFreePlay(); },
-            delegate { StartLevel(0); },
-            delegate { StartLevel(1); },
-            delegate { StartLevel(2); },
-            delegate { StartBjFree(); },
-            delegate { StartBlackjack(); },
-            delegate { Close(); }
-        };
-        float gridTop = 0.700f, cardH = 0.092f, gap = 0.013f;
-        for (int i = 0; i < 8; i++)
-        {
-            int col = i % 2, row = i / 2;
-            float x0 = 0.045f + col * 0.4725f, x1 = x0 + 0.4425f;
-            float y1 = gridTop - row * (cardH + gap), y0 = y1 - cardH;
-            NewCard(m, mTitle[i], mSub[i], V(x0, y0), V(x1, y1), actions[i], mAccent[i]);
-        }
-
-        Section(m, "HARTA", 0.265f);
-        NewPanel(m, "MapBack", V(0.045f, 0.105f), V(0.955f, 0.245f), new Color(0.30f, 0.20f, 0.06f, 0.55f));
-        NewButton(m, "<", V(0.045f, 0.105f), V(0.135f, 0.245f), delegate { StepMap(-1); }, gold, 26);
-        _mapT = NewLabel(m, "MapName", V(0.14f, 0.135f), V(0.86f, 0.245f), 22, TextAnchor.MiddleCenter);
-        NewButton(m, ">", V(0.865f, 0.105f), V(0.955f, 0.245f), delegate { StepMap(1); }, gold, 26);
-        _mapDots = new Image[Theme.MapCount];
-        for (int i = 0; i < Theme.MapCount; i++)
-        {
-            float cx = 0.5f + (i - (Theme.MapCount - 1) * 0.5f) * 0.045f;
-            _mapDots[i] = NewPanel(m, "Dot" + i, V(cx - 0.012f, 0.118f), V(cx + 0.012f, 0.136f), new Color(1f, 1f, 1f, 0.3f));
-        }
-        NewButton(m, "Dil nga aplikacioni", V(0.745f, 0.022f), V(0.955f, 0.082f), delegate { QuitApp(); }, new Color(0.62f, 0.10f, 0.17f), 13);
-        Text saying = NewLabel(m, "Saying", V(0.04f, 0.015f), V(0.73f, 0.09f), 12, TextAnchor.MiddleCenter);
-        saying.text = "<i>" + Sq.Saying + "</i>";
-        saying.color = new Color(0.95f, 0.85f, 0.55f);
+        // the main menu (the only menu): a title banner and two games, over the 3D room
+        _menuPanel = BuildMainMenu(h);
         BuildCardPanels(h);
         BuildPausePanel(h);
     }
 
-    Image[] _mapDots;
-
     static void Gold(Transform parent, Vector2 a, Vector2 b) { NewPanel(parent, "Frame", a, b, new Color(0.85f, 0.65f, 0.20f, 0.9f)); }
-
-    static void Section(Transform parent, string text, float y)
-    {
-        Text t = NewLabel(parent, "Section " + text, V(0.045f, y - 0.005f), V(0.3f, y + 0.037f), 13, TextAnchor.MiddleLeft);
-        t.text = "<b>" + text + "</b>";
-        t.color = new Color(0.95f, 0.78f, 0.35f);
-        NewPanel(parent, "Rule", V(0.045f + 0.012f * (text.Length + 1), y + 0.015f), V(0.955f, y + 0.0165f), new Color(0.85f, 0.65f, 0.20f, 0.45f));
-    }
-
-    /// <summary>A menu card: a dark button with a coloured edge, a title and a small line under it.</summary>
-    UiBtn NewCard(Transform parent, string title, string sub, Vector2 aMin, Vector2 aMax, UnityAction onClick, Color accent)
-    {
-        Image img = NewPanel(parent, "Button " + title, aMin, aMax, new Color(0.30f, 0.20f, 0.24f, 1f));
-        img.raycastTarget = true;
-        Button b = img.gameObject.AddComponent<Button>();
-        b.targetGraphic = img;
-        ColorBlock cb = b.colors;
-        cb.normalColor = new Color(0.62f, 0.62f, 0.66f, 1f);
-        cb.highlightedColor = Color.white;
-        cb.pressedColor = new Color(0.45f, 0.45f, 0.5f, 1f);
-        cb.selectedColor = new Color(0.62f, 0.62f, 0.66f, 1f);
-        cb.disabledColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-        cb.colorMultiplier = 1f;
-        cb.fadeDuration = 0.08f;
-        b.colors = cb;
-        b.onClick.AddListener(onClick);
-        b.onClick.AddListener(delegate { Play(Sfx.Click, 0.6f); });
-        NewPanel(img.transform, "Accent", V(0f, 0f), V(0.022f, 1f), accent);
-        Text t = NewLabel(img.transform, "Title", V(0.045f, 0.48f), V(1f, 1f), 17, TextAnchor.LowerLeft);
-        t.text = "<b>" + title + "</b>";
-        Text s = NewLabel(img.transform, "Sub", V(0.045f, 0f), V(1f, 0.52f), 12, TextAnchor.UpperLeft);
-        s.text = sub;
-        s.color = new Color(0.95f, 0.82f, 0.50f);
-        return new UiBtn { Go = img.gameObject, B = b, T = t };
-    }
 
     /// <summary>Chooses another map (menu: the room behind the menu changes; in a game: the backdrop changes right away).</summary>
     void StepMap(int direction)
@@ -340,15 +240,6 @@ public partial class Game3D
         RefreshHud();
     }
 
-    static void PlaceTop(UiBtn b, float x0, float x1)
-    {
-        var rt = (RectTransform)b.Go.transform;
-        rt.anchorMin = V(x0, 0.935f);
-        rt.anchorMax = V(x1, 0.99f);
-    }
-
-    static Sq.MapInfo MapInfoOf(int id) { return Sq.Maps[Mathf.Clamp(id + 1, 0, Sq.Maps.Length - 1)]; }
-
     // =====================================================================================
     // screen state
     // =====================================================================================
@@ -356,6 +247,7 @@ public partial class Game3D
     void ShowMenu()
     {
         SetPaused(false);
+        CloseOverlay();
         StopAllCoroutines();
         _mode = Mode.Menu;
         ClearDynamic();
@@ -386,9 +278,9 @@ public partial class Game3D
         bool card = holdem && _cardUp;
         bool inHand = holdem && _hand != null && !card;
 
-        // in the menu the two small buttons move to the top right, away from the menu card
-        PlaceTop(_topMusic, menu ? 0.80f : 0.300f, menu ? 0.885f : 0.375f);
-        PlaceTop(_topSpeed, menu ? 0.890f : 0.380f, menu ? 0.975f : 0.450f);
+        // the main menu shows nothing but its banner and its two games
+        _topMusic.Go.SetActive(!menu);
+        _topSpeed.Go.SetActive(!menu);
         _topMusic.T.text = _musicMode == 0 ? "Muzika: Himni" : (_musicMode == 1 ? "Muzika: folk" : "Muzika: jo");
         _topSpeed.T.text = "Shpejt";
         _topSpeed.Go.GetComponent<Image>().color = _spd < 0.99f ? new Color(0.50f, 0.38f, 0.07f) : new Color(0.22f, 0.20f, 0.24f);
@@ -400,12 +292,6 @@ public partial class Game3D
         _topCenter.Go.SetActive(!menu && _fpv);
         _lookHint.gameObject.SetActive(!menu && _fpv && !_lookUsed);
         _topMap.Go.SetActive(!menu && _mode != Mode.Tournament);
-        if (menu)
-        {
-            Sq.MapInfo mi = MapInfoOf(_map);
-            _mapT.text = "<b>" + mi.Name + "</b>\n<size=13>" + mi.Tagline + "</size>";
-            for (int i = 0; i < _mapDots.Length; i++) _mapDots[i].color = i == _map + 1 ? new Color(0.98f, 0.80f, 0.30f, 1f) : new Color(1f, 1f, 1f, 0.28f);
-        }
 
         RefreshHabitButtons();
         _menuPanel.SetActive(menu);
@@ -577,7 +463,7 @@ public partial class Game3D
         var sb = new StringBuilder();
         sb.Append("<size=24><b>" + c.Title + "</b></size>\n");
         sb.Append("<i>" + c.Tagline + "</i>\n\n");
-        sb.Append("Qyteti " + (_stage + 1) + " nga " + Tournament.Stages.Length + "\n");
+        sb.Append("Niveli " + (_stage + 1) + " nga " + Tournament.Stages.Length + "\n");
         sb.Append("<b>Kundërshtarët:</b>\n");
         for (int i = 0; i < d.BotNames.Length; i++)
             sb.Append(d.BotNames[i] + ", " + Sq.Style(d.Bots[i].Label) + "\n");

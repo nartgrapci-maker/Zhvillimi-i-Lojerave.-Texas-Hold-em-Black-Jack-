@@ -318,11 +318,22 @@ public partial class Game3D
     // free Blackjack: your own bet, doubling down, a 4-deck shoe, advice from basic strategy
     // =====================================================================================
 
-    void StartBjFree()
+    // the Blackjack tour: the seven places of the wheel as levels (oda first, then clockwise). In each one you start with the usual chips and
+    // must reach the city's goal to move on; go broke and you play that city again.
+    static readonly int[] BjTourGoal = { 260, 300, 340, 380, 420, 460, 500 };
+    int _bjStage = -1;           // -1: free Blackjack; 0..3: the city of the tour
+    bool _bjStageWon;
+
+    void StartBjFree() { StartBjGame(-1); }
+    void StartBjTour() { StartBjGame(0); }
+
+    void StartBjGame(int stage)
     {
         StopAllCoroutines();
         ClearDynamic();
-        SetCity(_map);
+        _bjStage = stage;
+        _bjStageWon = false;
+        SetCity(stage >= 0 ? stage - 1 : _map);       // tour level 0 is the oda (map -1)
         _mode = Mode.BjFree;
         _level = null;
         _fp = null;
@@ -337,7 +348,22 @@ public partial class Game3D
         BjSetPiles(0, _bt.Chips);
         AddLog("<b>Blackjack i lirë</b>: fillon me " + _bt.Chips + " " + Sq.Currency + ". Zgjidh bastin, pastaj ndaj letrat. " +
                "Çizme me " + BlackjackTable.Decks + " pako. Krupieri qëndron në të gjitha 17-at, Blackjack paguan 3:2.");
+        if (stage >= 0)
+        {
+            AddLog("<b>Turi i Blackjack-ut: " + Sq.Cities[stage].Title + "</b>  (niveli " + (stage + 1) + " nga " + BjTourGoal.Length +
+                   "). Qëllimi: arrij <b>" + BjTourGoal[stage] + " " + Sq.Currency + "</b> për të kaluar te qyteti tjetër.");
+            _banner = "<b>" + Sq.Cities[stage].Title + "</b>\nArrij " + BjTourGoal[stage] + " " + Sq.Currency + " për të kaluar në qytetin tjetër.";
+            Play(Sfx.Turn, 0.5f);
+        }
         RefreshHud();
+    }
+
+    /// <summary>The button at the end of a Blackjack game: next city, the same city again, or a new free game.</summary>
+    void OnBfRestart()
+    {
+        if (_bjStage < 0) StartBjFree();
+        else if (!_bjStageWon) StartBjGame(_bjStage);
+        else StartBjGame(_bjStage >= BjTourGoal.Length - 1 ? 0 : _bjStage + 1);
     }
 
     void OnBfBet(int direction)
@@ -349,7 +375,7 @@ public partial class Game3D
 
     void OnBfDeal()
     {
-        if (_mode != Mode.BjFree || _bt == null || _bjBusy || !_bt.CanDeal) return;
+        if (_mode != Mode.BjFree || _bt == null || _bjBusy || !_bt.CanDeal || _bjStageWon) return;
         BjResetTable();
         _bfHint = false;
         _br = _bt.Deal();
@@ -386,7 +412,17 @@ public partial class Game3D
             int net = _br.Net;
             _bt.Finish();                       // books the result into the chips and the statistics
             AddLog("<b>" + msg + "</b>");
-            if (_bt.IsBroke) msg += "\nTë mbaruan lekët. Fillo përsëri për një lojë të re.";
+            if (_bjStage >= 0 && _bt.Chips >= BjTourGoal[_bjStage])
+            {
+                _bjStageWon = true;
+                bool last = _bjStage >= BjTourGoal.Length - 1;
+                msg += last ? "\n<b>Fitove turin e Blackjack-ut! Je kampion i Shqipërisë.</b>"
+                            : "\n<b>" + Sq.Cities[_bjStage].Name + " u fitua!</b> Vazhdo te " + Sq.Cities[_bjStage + 1].Name + ".";
+                AddLog("<color=#7CFC9A><b>Qëllimi u arrit: " + _bt.Chips + " " + Sq.Currency + ".</b></color>");
+                Play(Sfx.Win, 0.8f);
+            }
+            else if (_bt.IsBroke)
+                msg += _bjStage >= 0 ? "\nTë mbaruan lekët. Provo përsëri këtë qytet." : "\nTë mbaruan lekët. Fillo përsëri për një lojë të re.";
             _banner = msg;
             BjMoods(net);
             BfRefreshChips();
@@ -434,14 +470,20 @@ public partial class Game3D
         if (_bt == null) return;
         bool broke = _bt.IsBroke;
         bool playing = _bt.Current != null;
-        bool betting = !playing && !broke;
+        bool won = _bjStageWon && !playing;
+        bool betting = !playing && !broke && !won;
         bool live = BfCanAct();
         _gBfBet.SetActive(betting);
         _gBfPlay.SetActive(playing);
-        _bBfRestart.Go.SetActive(broke);
+        _bBfRestart.Go.SetActive((broke || won) && !_bjBusy);
+        if (won) _bBfRestart.T.text = _bjStage >= BjTourGoal.Length - 1 ? "Luaj turin përsëri" : "Qyteti tjetër: " + Sq.Cities[_bjStage + 1].Name;
+        else _bBfRestart.T.text = _bjStage >= 0 ? "Provo përsëri këtë qytet" : "Fillo përsëri";
 
         var sb = new StringBuilder();
-        sb.Append("<b>Blackjack i lirë</b>\n");
+        if (_bjStage >= 0)
+            sb.Append("<b>Turi: " + Sq.Cities[_bjStage].Title + "</b>  (" + (_bjStage + 1) + "/" + BjTourGoal.Length + ")\n" +
+                      "Qëllimi: <b>" + BjTourGoal[_bjStage] + "</b> " + Sq.Currency + "\n");
+        else sb.Append("<b>Blackjack i lirë</b>\n");
         sb.Append("Lekë: <b>" + _bt.Chips + "</b>  ·  basti " + _bt.Bet + "\n");
         sb.Append("Fitore " + _bt.Wins + "  ·  humbje " + _bt.Losses);
         _infoT.text = sb.ToString();

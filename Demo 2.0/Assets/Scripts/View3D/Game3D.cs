@@ -23,6 +23,11 @@ public partial class Game3D : MonoBehaviour
     static readonly Vector3 CamBase = new Vector3(0f, 5.2f, -6.8f);
     static readonly Vector3 CamTarget = new Vector3(0f, 1.0f, 0.4f);
     const float CamFov = 58f;
+    // menu view: over the near half of the table, tilted up ~7 degrees, so the felt fills the bottom fifth of the screen
+    // and the lake, the Alps and the castle fill the middle (the banner and the two game cards sit over them)
+    static readonly Vector3 MenuCamPos = new Vector3(0f, 1.6f, -1.9f);
+    static readonly Vector3 MenuCamTarget = new Vector3(0f, 4.0f, 18f);
+    const float MenuFov = 52f;
     static readonly Vector3 FpPos = new Vector3(0f, 1.66f, -3.05f);
     static readonly Vector3 FpTarget = new Vector3(0f, 0.93f, 0.25f);
     // the first-person view is chosen by its HORIZONTAL angle (a monitor-style 100 / 120 / 140 degrees); Unity wants the vertical one
@@ -254,9 +259,19 @@ public partial class Game3D : MonoBehaviour
         return 0f;
     }
 
+    void OnApplicationFocus(bool focus) { Gfx.SetBackground(!focus); }
+    void OnApplicationPause(bool paused) { Gfx.SetBackground(paused); }
+
     void Update()
     {
-        if (EscPressed()) TogglePause();
+        if (EscPressed())
+        {
+            if (_paused) TogglePause();
+            else if (!CloseOverlay()) TogglePause();      // Esc first closes the city wheel or the help card
+        }
+        UpdateMenuKeys();
+        Gfx.SetCalm(_paused || WheelOpen || HelpOpen);      // a card covers the room: ~30 fps is plenty
+        Gfx.Tick(Time.unscaledDeltaTime);
         if (_cam == null) return;
         float t = Time.time;
         bool fp = FirstPersonNow;
@@ -271,11 +286,19 @@ public partial class Game3D : MonoBehaviour
         }
         else
         {
-            pos = CamBase;
-            if (_mode == Mode.Menu) pos += new Vector3(Mathf.Sin(t * 0.18f) * 2.2f, 0.35f + Mathf.Sin(t * 0.11f) * 0.2f, 0f);
-            else pos += new Vector3(Mathf.Sin(t * 0.25f) * 0.35f, Mathf.Sin(t * 0.17f) * 0.1f, 0f);
-            look = _mode == Mode.Menu ? CamTarget + new Vector3(-3.4f, 0f, 0f) : CamTarget;   // the menu card covers the left half, so the table sits on the right
-            fov = CamFov;
+            if (_mode == Mode.Menu)
+            {
+                // the menu: low over the near edge of the table, looking out over the lake to the castle, drifting slowly
+                pos = MenuCamPos + new Vector3(Mathf.Sin(t * 0.13f) * 0.35f, Mathf.Sin(t * 0.09f) * 0.06f, 0f);
+                look = MenuCamTarget + new Vector3(Mathf.Sin(t * 0.07f) * 0.6f, 0f, 0f);
+                fov = MenuFov;
+            }
+            else
+            {
+                pos = CamBase + new Vector3(Mathf.Sin(t * 0.25f) * 0.35f, Mathf.Sin(t * 0.17f) * 0.1f, 0f);
+                look = CamTarget;
+                fov = CamFov;
+            }
         }
         float k = Mathf.Clamp01(Time.deltaTime * 2.2f);
         _cam.transform.position = Vector3.Lerp(_cam.transform.position, pos, k);
@@ -352,6 +375,7 @@ public partial class Game3D : MonoBehaviour
         if (_musicMode == 0) { _music.clip = Music.Anthem; _music.volume = 0.6f; }
         else { _music.clip = Music.Loop; _music.volume = 0.2f; }
         if (_musicOn) _music.Play();
+        RefreshSoundButton();             // the menu's sound button follows the in-game "Muzika" button too
     }
 
     void ToggleView()

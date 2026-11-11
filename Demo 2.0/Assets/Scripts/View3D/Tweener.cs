@@ -21,6 +21,7 @@ public class Tweener : MonoBehaviour
         _lift = arcLift;
         _t = 0f;
         _moving = true;
+        enabled = true;
     }
 
     public void Scale(Vector3 from, Vector3 to, float duration, float startDelay = 0f)
@@ -31,6 +32,7 @@ public class Tweener : MonoBehaviour
         _sdelay = startDelay;
         _st = 0f;
         _scaling = true;
+        enabled = true;
         transform.localScale = from;
     }
 
@@ -61,5 +63,6 @@ public class Tweener : MonoBehaviour
                 if (k >= 1f) _scaling = false;
             }
         }
+        if (!_moving && !_scaling) enabled = false;      // finished: no more Update calls until the next Go / Scale
     }
 }

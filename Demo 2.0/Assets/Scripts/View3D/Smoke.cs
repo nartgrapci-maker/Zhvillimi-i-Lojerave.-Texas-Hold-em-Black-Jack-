@@ -17,7 +17,7 @@ public static class Smoke
         go.name = "Smoke";
         go.transform.position = pos;
         go.transform.localScale = Vector3.one * size;
-        MeshKit.Smooth(go, PrimitiveType.Sphere);
+        go.GetComponent<MeshFilter>().sharedMesh = MeshKit.SphereLo;   // small, soft and see-through: low poly is plenty
         Renderer r = go.GetComponent<Renderer>();
         r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         r.receiveShadows = false;
@@ -41,6 +41,8 @@ public class SmokePuff : MonoBehaviour
     public Vector3 Velocity;
     public float Size, Life, Grey;
     float _age;
+    Renderer _r;
+    int _step = -1;
 
     void Update()
     {
@@ -53,7 +55,10 @@ public class SmokePuff : MonoBehaviour
         transform.localScale = Vector3.one * Size * (0.6f + 1.9f * p);
         float fade = p < 0.15f ? p / 0.15f : 1f - (p - 0.15f) / 0.85f;
         int step = Mathf.Clamp(Mathf.RoundToInt(fade * 7f), 0, 7);
+        if (step == _step) return;                                 // the material only changes 8 times in a puff's life
+        _step = step;
+        if (_r == null) _r = GetComponent<Renderer>();
         float a = step / 7f * 0.34f;
-        GetComponent<Renderer>().sharedMaterial = Mats.Unlit(new Color(Grey, Grey, Grey * 0.97f, a));
+        _r.sharedMaterial = Mats.Unlit(new Color(Grey, Grey, Grey * 0.97f, a));
     }
 }

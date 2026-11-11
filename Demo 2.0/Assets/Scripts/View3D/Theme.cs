@@ -27,14 +27,80 @@ public static class Theme
         for (int i = 0; i < px.Length; i++)
             px[i] = new Color32(rgba[i * 4], rgba[i * 4 + 1], rgba[i * 4 + 2], rgba[i * 4 + 3]);
         tex.SetPixels32(px);
-        tex.Apply(true);
+        tex.Apply(true, true);              // upload and drop the CPU copy: nothing reads these back, so it would only double the memory
         return tex;
     }
 
-    /// <summary>The double-headed eagle, white on transparent (tint it with the material colour).</summary>
+    /// <summary>
+    /// The double-headed eagle, white on transparent (tint it with the material colour). It comes from the picture
+    /// Assets/Resources/Eagle.png (a dark eagle on a white, light or transparent background) when that file is there,
+    /// otherwise from the eagle drawn in code.
+    /// </summary>
     public static Texture2D Eagle
     {
-        get { if (_eagle == null) _eagle = FromRgba(Art.EagleRGBA(512, 255, 255, 255), 512, 512, TextureWrapMode.Clamp); return _eagle; }
+        get
+        {
+            if (_eagle == null) _eagle = EagleFromPicture();
+            if (_eagle == null) _eagle = FromRgba(Art.EagleRGBA(512, 255, 255, 255), 512, 512, TextureWrapMode.Clamp);
+            return _eagle;
+        }
+    }
+
+    /// <summary>
+    /// Turns the eagle picture into a white mask: dark pixels become the eagle, light ones (and any grey checkerboard
+    /// in the picture's background) become transparent. The eagle is cropped and centred in a square. The picture is
+    /// copied through the GPU, so it does not need "Read/Write" switched on in its import settings.
+    /// </summary>
+    static Texture2D EagleFromPicture()
+    {
+        Texture2D src = Resources.Load<Texture2D>("Eagle");
+        if (src == null) return null;
+        int w = src.width, h = src.height;
+        RenderTexture rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        RenderTexture prev = RenderTexture.active;
+        Graphics.Blit(src, rt);
+        RenderTexture.active = rt;
+        var read = new Texture2D(w, h, TextureFormat.RGBA32, false);
+        read.ReadPixels(new Rect(0, 0, w, h), 0, 0);
+        read.Apply(false);
+        RenderTexture.active = prev;
+        RenderTexture.ReleaseTemporary(rt);
+        Color32[] px = read.GetPixels32();
+        UnityEngine.Object.Destroy(read);
+
+        // coverage of each pixel and the eagle's bounding box
+        var cov = new float[w * h];
+        int x0 = w, y0 = h, x1 = -1, y1 = -1;
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                Color32 c = px[y * w + x];
+                float lum = (0.299f * c.r + 0.587f * c.g + 0.114f * c.b) / 255f;
+                float a = Mathf.Clamp01((0.6f - lum) / 0.3f) * (c.a / 255f);
+                cov[y * w + x] = a;
+                if (a > 0.5f) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+            }
+        if (x1 < 0) return null;
+
+        // a square canvas with a small margin, the eagle in the middle
+        int side = Mathf.Max(x1 - x0 + 1, y1 - y0 + 1);
+        int pad = side / 20, n = side + pad * 2;
+        int ox = x0 - pad - (side - (x1 - x0 + 1)) / 2, oy = y0 - pad - (side - (y1 - y0 + 1)) / 2;
+        var outPx = new Color32[n * n];
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                int sx = x + ox, sy = y + oy;
+                float a = sx >= 0 && sy >= 0 && sx < w && sy < h ? cov[sy * w + sx] : 0f;
+                outPx[y * n + x] = new Color32(255, 255, 255, (byte)(a * 255f));
+            }
+        var tex = new Texture2D(n, n, TextureFormat.RGBA32, true);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        tex.filterMode = FilterMode.Trilinear;
+        tex.anisoLevel = 8;
+        tex.SetPixels32(outPx);
+        tex.Apply(true, true);
+        return tex;
     }
 
     /// <summary>A long kilim strip for the wall.</summary>

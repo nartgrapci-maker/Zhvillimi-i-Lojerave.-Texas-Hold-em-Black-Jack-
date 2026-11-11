@@ -83,11 +83,38 @@ public static class Mats
         return m;
     }
 
+    static Shader _opaqueUnlitShader;
+    static bool _opaqueLooked;
+
+    /// <summary>URP's own unlit shader: opaque, works with the SRP Batcher and writes depth (no overdraw). Null outside URP.</summary>
+    static Shader OpaqueUnlitShader
+    {
+        get
+        {
+            if (!_opaqueLooked)
+            {
+                _opaqueLooked = true;
+                if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null)
+                    _opaqueUnlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+            }
+            return _opaqueUnlitShader;
+        }
+    }
+
     public static Material Unlit(Color c, Texture tex = null)
     {
         long key = Key(c, tex == null ? 0 : TextureId(tex));
         Material m;
         if (_unlit.TryGetValue(key, out m) && m != null) return m;
+        if (tex == null && c.a >= 0.999f && OpaqueUnlitShader != null)
+        {
+            // a plain solid colour: the sprite shader would draw it as a transparent object, sorted one by one
+            m = new Material(OpaqueUnlitShader);
+            SetColor(m, c);
+            if (m.HasProperty("_Cull")) m.SetFloat("_Cull", 0f);      // two-sided, like the sprite shader
+            _unlit[key] = m;
+            return m;
+        }
         m = new Material(UnlitShader);
         SetColor(m, c);
         if (tex != null) m.mainTexture = tex;
@@ -278,7 +305,7 @@ public static class SuitTextures
             }
         }
         tex.SetPixels32(px);
-        tex.Apply(true);
+        tex.Apply(true, true);             // GPU only: no second copy in system memory
         _cache[index] = tex;
         return tex;
     }

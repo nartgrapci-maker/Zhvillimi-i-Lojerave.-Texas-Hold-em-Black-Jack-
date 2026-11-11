@@ -11,7 +11,7 @@ public partial class Game3D
     int _city = -2;            // the map that is built right now (-1 oda, 0..3 cities of the tournament, 4 Sarandë, 5 Theth)
     int _face;                 // which side of the room is being built (0 = in front of the player, then 90, 180 and 270 degrees round)
     static bool _lite;         // true for the side that is behind the player: no window lights, it is rarely seen
-    int _map = -1;             // the map the player chose in the menu (used by every mode except the tournament)
+    int _map = 0;              // the map of every mode except the tournament: Shkodër (the lake and Rozafa castle) behind the menu; "Harta" changes it in a game
     readonly Dictionary<int, Texture2D> _skyCache = new Dictionary<int, Texture2D>();
 
     // ---------------------------------------------------------------------------------------
@@ -21,6 +21,7 @@ public partial class Game3D
     static GameObject Bx(Transform p, PrimitiveType type, float x, float y, float z, float sx, float sy, float sz, Material m, string name)
     {
         GameObject g = Prim.Make(type, p, new Vector3(x, y, z), new Vector3(sx, sy, sz), m, name);
+        MeshKit.MakeLowPoly(g);                 // the backdrop is far away: no need for 2000-vertex spheres
         Renderer r = g.GetComponent<Renderer>();
         r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         r.receiveShadows = false;
@@ -43,6 +44,7 @@ public partial class Game3D
     static GameObject Cn(Transform p, float x, float y, float z, float sx, float sy, float sz, Material m, string name)
     {
         GameObject g = Prim.Cone(p, new Vector3(x, y, z), new Vector3(sx, sy, sz), m, name);
+        g.GetComponent<MeshFilter>().sharedMesh = MeshKit.ConeLo;
         Renderer r = g.GetComponent<Renderer>();
         r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         r.receiveShadows = false;
@@ -274,6 +276,7 @@ public partial class Game3D
     {
         if (city == _city && _back != null) return;
         _city = city;
+        bool hadOld = _back != null;
         if (_back != null) Destroy(_back);
         _sways.Clear();
         _fireLight = null;
@@ -309,6 +312,34 @@ public partial class Game3D
 
         // the other tables, where other people play
         BuildAmbient(p, L, new System.Random(77 + city));
+
+        BatchBackdrop();
+        Gfx.Settle();
+        if (hadOld) Invoke("UnloadUnused", 0.2f);      // once the old backdrop is really gone: free its combined meshes
+    }
+
+    void UnloadUnused() { Resources.UnloadUnusedAssets(); }
+
+    /// <summary>
+    /// A backdrop is a few thousand small objects that never move. Static batching merges the ones that share a material
+    /// into big meshes, so the GPU gets far fewer draw calls. Flags and lanterns (they sway) and people (they move) are left out.
+    /// </summary>
+    void BatchBackdrop()
+    {
+        var moving = new HashSet<Transform>();
+        for (int i = 0; i < _sways.Count; i++) if (_sways[i].T != null) moving.Add(_sways[i].T);
+        var list = new List<GameObject>();
+        foreach (MeshRenderer r in _back.GetComponentsInChildren<MeshRenderer>())
+        {
+            MeshFilter mf = r.GetComponent<MeshFilter>();
+            if (mf == null || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
+            if (r.GetComponentInParent<AvatarView>() != null) continue;
+            bool sways = false;
+            for (Transform t = r.transform; t != null && t != _back.transform; t = t.parent)
+                if (moving.Contains(t)) { sways = true; break; }
+            if (!sways) list.Add(r.gameObject);
+        }
+        if (list.Count > 1) StaticBatchingUtility.Combine(list.ToArray(), _back);
     }
 
     void BuildFace(Transform p, Theme.CityLook L, System.Random rng)
@@ -371,7 +402,7 @@ public partial class Game3D
     // ---------------------------------------------------------------------------------------
 
     static readonly string[] AmbientMen = { "Besnik", "Dritan", "Gezim", "Luan", "Petrit", "Arben", "Flamur", "Altin", "Skënder", "Ilir" };
-    static readonly string[] AmbientWomen = { "Rozafa", "Drita", "Vjollca", "Teuta", "Elira" };
+    static readonly string[] AmbientWomen = { "Rozafa", "Drita", "Vjollca", "Teuta", "Elira", "Lule", "Klea", "Mrika" };
 
     /// <summary>Six more round tables around the main one, each with players, cards, chips and a rug; and four pots with plants.</summary>
     void BuildAmbient(Transform p, Theme.CityLook L, System.Random rng)

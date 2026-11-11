@@ -102,9 +102,11 @@ public static class Sq
         return name;
     }
 
-    static readonly HashSet<string> Women = new HashSet<string> { "Rozafa", "Drita", "Vjollca", "Teuta", "Elira" };
+    // every woman in the game: the tour (Lule, Rozafa, Drita, Vjollca, Teuta, Klea, Mrika), free play (Elira), the other
+    // tables, and the Core's fallback name (Lena). Anyone not listed is drawn as a man.
+    static readonly HashSet<string> Women = new HashSet<string> { "Rozafa", "Drita", "Vjollca", "Teuta", "Elira", "Lule", "Klea", "Mrika", "Lena" };
 
-    public static bool IsFemale(string name) { return Women.Contains(name); }
+    public static bool IsFemale(string name) { return name != null && Women.Contains(name.Trim()); }
 
     /// <summary>"lojtar llogaritës", "lojtar i egër": how a bot's style is described.</summary>
     public static string Style(string label)
@@ -412,12 +414,16 @@ public static class Sq
         public string Name, Title, Tagline;
     }
 
+    /// <summary>The seven levels of the tour, in the order of the city wheel (clockwise from the top). Level s is map s - 1.</summary>
     public static readonly City[] Cities =
     {
+        new City { Name = "Oda e burrave", Title = "Oda e burrave · Fillimi", Tagline = "Pranë oxhakut, me kafe e raki: këtu fillon udhëtimi." },
         new City { Name = "Shkodër", Title = "Shkodra · Qyteti i Rozafës", Tagline = "Pranë liqenit, nën kështjellën e Rozafës." },
         new City { Name = "Berat", Title = "Berati · Qyteti i njëmijë dritareve", Tagline = "Shtëpi të bardha që ngjiten në kodër." },
         new City { Name = "Gjirokastër", Title = "Gjirokastra · Qyteti i gurit", Tagline = "Rrugë me kalldrëm dhe shtëpi guri nën kala." },
-        new City { Name = "Tiranë", Title = "Tirana · Finalja", Tagline = "Te Sheshi Skënderbej caktohet kampioni." }
+        new City { Name = "Tiranë", Title = "Tirana · Kryeqyteti", Tagline = "Te Sheshi Skënderbej luajnë më të mirët e qytetit." },
+        new City { Name = "Sarandë", Title = "Saranda · Riviera shqiptare", Tagline = "Perëndimi i diellit mbi detin Jon." },
+        new City { Name = "Theth", Title = "Theti · Finalja", Tagline = "Kulla e gurtë nën majat e Alpeve: këtu caktohet kampioni." }
     };
 
     /// <summary>A place the player can choose to play in. Id is the number the world builder uses (-1 is the oda).</summary>
@@ -429,13 +435,13 @@ public static class Sq
 
     public static readonly MapInfo[] Maps =
     {
-        new MapInfo { Id = -1, Name = "Oda e burrave", Title = "Oda e burrave", Tagline = "Pranë oxhakut, me kafe e raki, si në çdo shtëpi shqiptare." },
-        new MapInfo { Id = 0, Name = "Shkodër", Title = Cities[0].Title, Tagline = Cities[0].Tagline },
-        new MapInfo { Id = 1, Name = "Berat", Title = Cities[1].Title, Tagline = Cities[1].Tagline },
-        new MapInfo { Id = 2, Name = "Gjirokastër", Title = Cities[2].Title, Tagline = Cities[2].Tagline },
-        new MapInfo { Id = 3, Name = "Tiranë", Title = Cities[3].Title, Tagline = Cities[3].Tagline },
-        new MapInfo { Id = 4, Name = "Sarandë", Title = "Saranda · Riviera shqiptare", Tagline = "Perëndimi i diellit mbi detin Jon." },
-        new MapInfo { Id = 5, Name = "Theth", Title = "Theti · Alpet Shqiptare", Tagline = "Kulla e gurtë nën majat e Alpeve, në agim." }
+        new MapInfo { Id = -1, Name = "Oda e burrave", Title = Cities[0].Title, Tagline = Cities[0].Tagline },
+        new MapInfo { Id = 0, Name = "Shkodër", Title = Cities[1].Title, Tagline = Cities[1].Tagline },
+        new MapInfo { Id = 1, Name = "Berat", Title = Cities[2].Title, Tagline = Cities[2].Tagline },
+        new MapInfo { Id = 2, Name = "Gjirokastër", Title = Cities[3].Title, Tagline = Cities[3].Tagline },
+        new MapInfo { Id = 3, Name = "Tiranë", Title = Cities[4].Title, Tagline = Cities[4].Tagline },
+        new MapInfo { Id = 4, Name = "Sarandë", Title = Cities[5].Title, Tagline = Cities[5].Tagline },
+        new MapInfo { Id = 5, Name = "Theth", Title = Cities[6].Title, Tagline = Cities[6].Tagline }
     };
 
     public const string Welcome = "Mirë se vjen! Kafeja është gati, letrat janë të përziera.";
