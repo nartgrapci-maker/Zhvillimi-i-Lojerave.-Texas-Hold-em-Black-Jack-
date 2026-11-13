@@ -597,7 +597,7 @@ public partial class Game3D
             if (_mode == Mode.Tournament)
             {
                 if (_fp.HumanIsOut) end = "Të mbaruan lekët në " + Sq.Cities[_stage].Name + ". Provo përsëri!";
-                else if (_stage >= Tournament.Stages.Length - 1) end = "KAMPION I SHQIPËRISË! I fitove të shtatë nivelet, nga oda deri në Theth.";
+                else if (_stage >= Tournament.Stages.Length - 1) end = "KAMPION I TROJEVE SHQIPTARE! I fitove të shtatë nivelet, nga oda deri në Ulqin.";
                 else end = "Fitove në " + Sq.Cities[_stage].Name + "! Rruga vazhdon drejt " + Sq.Cities[_stage + 1].Name + ".";
             }
             else end = _fp.HumanIsOut ? "Të mbaruan lekët. Loja mbaroi." : "I nxore të tre kundërshtarët nga loja. Fitove lojën!";

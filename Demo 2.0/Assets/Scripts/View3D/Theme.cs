@@ -162,13 +162,13 @@ public static class Theme
     }
 
     // ---------------------------------------------------------------------------------------
-    // one look per map. Maps -1 (the oda), 0..3 (the cities of the tournament), 4 (Sarandë), 5 (Theth)
+    // one look per map. Maps -1 (the oda), 0..3 (Shkodër, Berat, Prishtinë, Tiranë), 4 (Sarandë), 5 (Ulqin)
     // ---------------------------------------------------------------------------------------
 
     public class CityLook
     {
         public Color Felt, FeltInner, Wall, Sky, SkyTop, House, HouseDark, Window, Rug, Floor;
-        public int Style;          // 0 oda, 1 Shkodër, 2 Berat, 3 Gjirokastër, 4 Tiranë, 5 Sarandë, 6 Theth
+        public int Style;          // 0 oda, 1 Shkodër, 2 Berat, 3 Prishtinë, 4 Tiranë, 5 Sarandë, 6 Ulqin
     }
 
     public const int MapCount = 7;                 // -1 .. 5
@@ -193,13 +193,13 @@ public static class Theme
                     House = new Color(0.97f, 0.95f, 0.90f), HouseDark = new Color(0.78f, 0.75f, 0.72f),
                     Window = new Color(1f, 0.78f, 0.35f), Rug = new Color(0.70f, 0.85f, 0.70f), Floor = new Color(0.12f, 0.10f, 0.12f), Style = 2
                 };
-            case 2: // Gjirokastër: stone houses and the castle
+            case 2: // Prishtinë: a young capital at dusk, the NEWBORN letters and the domes of the National Library
                 return new CityLook
                 {
-                    Felt = new Color(0.18f, 0.21f, 0.30f), FeltInner = new Color(0.21f, 0.25f, 0.34f),
-                    Wall = new Color(0.08f, 0.08f, 0.11f), Sky = new Color(0.42f, 0.38f, 0.46f), SkyTop = new Color(0.06f, 0.07f, 0.15f),
-                    House = new Color(0.78f, 0.78f, 0.80f), HouseDark = new Color(0.52f, 0.52f, 0.56f),
-                    Window = new Color(1f, 0.74f, 0.32f), Rug = new Color(0.80f, 0.74f, 0.64f), Floor = new Color(0.12f, 0.11f, 0.13f), Style = 3
+                    Felt = new Color(0.08f, 0.16f, 0.42f), FeltInner = new Color(0.10f, 0.20f, 0.48f),
+                    Wall = new Color(0.08f, 0.08f, 0.14f), Sky = new Color(0.90f, 0.52f, 0.36f), SkyTop = new Color(0.10f, 0.08f, 0.26f),
+                    House = new Color(0.82f, 0.80f, 0.78f), HouseDark = new Color(0.50f, 0.50f, 0.56f),
+                    Window = new Color(1f, 0.86f, 0.52f), Rug = new Color(0.78f, 0.82f, 0.98f), Floor = new Color(0.13f, 0.12f, 0.14f), Style = 3
                 };
             case 3: // Tiranë: the final, red and black
                 return new CityLook
@@ -217,13 +217,13 @@ public static class Theme
                     House = new Color(0.98f, 0.96f, 0.90f), HouseDark = new Color(0.86f, 0.82f, 0.76f),
                     Window = new Color(1f, 0.80f, 0.40f), Rug = new Color(0.85f, 0.88f, 1f), Floor = new Color(0.17f, 0.13f, 0.12f), Style = 5
                 };
-            case 5: // Theth: the Albanian Alps at dawn
+            case 5: // Ulqin: the old town on its rock above the Adriatic, by moonlight
                 return new CityLook
                 {
-                    Felt = new Color(0.33f, 0.20f, 0.10f), FeltInner = new Color(0.38f, 0.23f, 0.12f),
-                    Wall = new Color(0.10f, 0.12f, 0.16f), Sky = new Color(0.62f, 0.72f, 0.86f), SkyTop = new Color(0.07f, 0.13f, 0.32f),
-                    House = new Color(0.72f, 0.70f, 0.68f), HouseDark = new Color(0.46f, 0.44f, 0.44f),
-                    Window = new Color(1f, 0.80f, 0.45f), Rug = new Color(0.90f, 0.82f, 0.70f), Floor = new Color(0.10f, 0.12f, 0.10f), Style = 6
+                    Felt = new Color(0.03f, 0.27f, 0.30f), FeltInner = new Color(0.04f, 0.32f, 0.35f),
+                    Wall = new Color(0.06f, 0.09f, 0.14f), Sky = new Color(0.22f, 0.34f, 0.50f), SkyTop = new Color(0.02f, 0.04f, 0.12f),
+                    House = new Color(0.90f, 0.86f, 0.78f), HouseDark = new Color(0.58f, 0.54f, 0.50f),
+                    Window = new Color(1f, 0.78f, 0.38f), Rug = new Color(0.70f, 0.86f, 0.90f), Floor = new Color(0.12f, 0.11f, 0.12f), Style = 6
                 };
             default: // the oda e burrave
                 return new CityLook

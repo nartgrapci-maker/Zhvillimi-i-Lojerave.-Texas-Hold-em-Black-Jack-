@@ -420,10 +420,10 @@ public static class Sq
         new City { Name = "Oda e burrave", Title = "Oda e burrave · Fillimi", Tagline = "Pranë oxhakut, me kafe e raki: këtu fillon udhëtimi." },
         new City { Name = "Shkodër", Title = "Shkodra · Qyteti i Rozafës", Tagline = "Pranë liqenit, nën kështjellën e Rozafës." },
         new City { Name = "Berat", Title = "Berati · Qyteti i njëmijë dritareve", Tagline = "Shtëpi të bardha që ngjiten në kodër." },
-        new City { Name = "Gjirokastër", Title = "Gjirokastra · Qyteti i gurit", Tagline = "Rrugë me kalldrëm dhe shtëpi guri nën kala." },
+        new City { Name = "Prishtinë", Title = "Prishtina · Qyteti i rinisë", Tagline = "Te monumenti NEWBORN, nën kupolat e Bibliotekës Kombëtare." },
         new City { Name = "Tiranë", Title = "Tirana · Kryeqyteti", Tagline = "Te Sheshi Skënderbej luajnë më të mirët e qytetit." },
         new City { Name = "Sarandë", Title = "Saranda · Riviera shqiptare", Tagline = "Perëndimi i diellit mbi detin Jon." },
-        new City { Name = "Theth", Title = "Theti · Finalja", Tagline = "Kulla e gurtë nën majat e Alpeve: këtu caktohet kampioni." }
+        new City { Name = "Ulqin", Title = "Ulqini · Finalja", Tagline = "Kalaja mbi Adriatik nën dritën e hënës: këtu caktohet kampioni." }
     };
 
     /// <summary>A place the player can choose to play in. Id is the number the world builder uses (-1 is the oda).</summary>
@@ -438,10 +438,10 @@ public static class Sq
         new MapInfo { Id = -1, Name = "Oda e burrave", Title = Cities[0].Title, Tagline = Cities[0].Tagline },
         new MapInfo { Id = 0, Name = "Shkodër", Title = Cities[1].Title, Tagline = Cities[1].Tagline },
         new MapInfo { Id = 1, Name = "Berat", Title = Cities[2].Title, Tagline = Cities[2].Tagline },
-        new MapInfo { Id = 2, Name = "Gjirokastër", Title = Cities[3].Title, Tagline = Cities[3].Tagline },
+        new MapInfo { Id = 2, Name = "Prishtinë", Title = Cities[3].Title, Tagline = Cities[3].Tagline },
         new MapInfo { Id = 3, Name = "Tiranë", Title = Cities[4].Title, Tagline = Cities[4].Tagline },
         new MapInfo { Id = 4, Name = "Sarandë", Title = Cities[5].Title, Tagline = Cities[5].Tagline },
-        new MapInfo { Id = 5, Name = "Theth", Title = Cities[6].Title, Tagline = Cities[6].Tagline }
+        new MapInfo { Id = 5, Name = "Ulqin", Title = Cities[6].Title, Tagline = Cities[6].Tagline }
     };
 
     public const string Welcome = "Mirë se vjen! Kafeja është gati, letrat janë të përziera.";

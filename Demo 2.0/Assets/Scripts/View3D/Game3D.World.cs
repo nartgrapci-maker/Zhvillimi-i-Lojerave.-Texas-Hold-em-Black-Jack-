@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using PokerDemo.Core;
 
-/// <summary>The room: a table with a kilim rim, a rug, lights, and a place to play in (the oda, one of five cities, the coast or the mountains).</summary>
+/// <summary>The room: a table with a kilim rim, a rug, lights, and a place to play in (the oda, one of the cities, or the coast).</summary>
 public partial class Game3D
 {
     GameObject _back;
     Renderer _feltR, _feltInnerR, _floorR;
     Light _fireLight;
-    int _city = -2;            // the map that is built right now (-1 oda, 0..3 cities of the tournament, 4 Sarandë, 5 Theth)
+    int _city = -2;            // the map that is built right now (-1 oda, 0 Shkodër, 1 Berat, 2 Prishtinë, 3 Tiranë, 4 Sarandë, 5 Ulqin)
     int _face;                 // which side of the room is being built (0 = in front of the player, then 90, 180 and 270 degrees round)
     static bool _lite;         // true for the side that is behind the player: no window lights, it is rarely seen
     int _map = 0;              // the map of every mode except the tournament: Shkodër (the lake and Rozafa castle) behind the menu; "Harta" changes it in a game
@@ -292,7 +292,7 @@ public partial class Game3D
         RenderSettings.ambientLight = L.Style == 0 ? new Color(0.40f, 0.34f, 0.32f) : Color.Lerp(new Color(0.34f, 0.32f, 0.38f), L.Sky, 0.25f);
 
         // the floor: wooden planks on the oda and on the wooden terraces, paving stones in the cities
-        bool planks = L.Style == 0 || L.Style == 5 || L.Style == 6;
+        bool planks = L.Style == 0 || L.Style == 5;
         _floorR.sharedMaterial = planks
             ? Mats.LitTex(L.Style == 0 ? new Color(0.78f, 0.62f, 0.50f) : new Color(0.62f, 0.52f, 0.46f), Theme.Wood, 90f / 3.2f, 90f / 3.2f, 0.25f)
             : Mats.LitTex(new Color(Mathf.Min(1f, L.Floor.r * 3.2f + 0.02f), Mathf.Min(1f, L.Floor.g * 3.2f + 0.02f), Mathf.Min(1f, L.Floor.b * 3.2f + 0.02f)), Theme.Stone, 90f / 3.0f, 90f / 3.0f, 0.2f);
@@ -356,17 +356,17 @@ public partial class Game3D
         {
             case 1: BuildShkoder(p, L, rng); break;
             case 2: BuildBerat(p, L, rng); break;
-            case 3: BuildGjirokaster(p, L, rng); break;
+            case 3: BuildPrishtine(p, L, rng); break;
             case 4: BuildTirane(p, L, rng); break;
             case 5: BuildSarande(p, L, rng); break;
-            case 6: BuildTheth(p, L, rng); break;
+            case 6: BuildUlqin(p, L, rng); break;
             default: BuildOda(p, L); break;
         }
 
-        // moon and stars over the cities at dusk
-        if (L.Style >= 1 && L.Style <= 4)
+        // moon and stars over the cities at dusk (Ulqin has its own moon, low over the sea)
+        if ((L.Style >= 1 && L.Style <= 4) || L.Style == 6)
         {
-            if (_face == 0) Bx(p, PrimitiveType.Sphere, -9.5f, 11.5f, 46f, 2.4f, 2.4f, 0.3f, Mats.Unlit(new Color(0.98f, 0.95f, 0.84f)), "Moon");
+            if (_face == 0 && L.Style != 6) Bx(p, PrimitiveType.Sphere, -9.5f, 11.5f, 46f, 2.4f, 2.4f, 0.3f, Mats.Unlit(new Color(0.98f, 0.95f, 0.84f)), "Moon");
             Material star = Mats.Unlit(new Color(1f, 0.95f, 0.8f));
             for (int i = 0; i < 30; i++)
                 Bx(p, PrimitiveType.Sphere, (float)(rng.NextDouble() * 70.0 - 35.0), 14f + (float)rng.NextDouble() * 12f, 50f, 0.14f, 0.14f, 0.14f, star, "Star");
@@ -735,34 +735,118 @@ public partial class Game3D
         for (int i = 0; i < 12; i++) Cn(p, -22f + i * 4f, 5.6f + (i % 3) * 0.3f, 15.2f, 0.5f, 1.4f, 0.5f, Mats.Lit(new Color(0.08f, 0.25f, 0.12f), 0.05f), "Cypress");
     }
 
-    void BuildGjirokaster(Transform p, Theme.CityLook L, System.Random rng)
+    void BuildPrishtine(Transform p, Theme.CityLook L, System.Random rng)
     {
-        // grey stone houses with slate roofs, and the fortress with its clock tower
-        for (int i = 0; i < 4; i++) Mountain(p, -26f + i * 17f, 37f, 20f + (i % 2) * 4f, new Color(0.20f, 0.22f, 0.32f), true);
-        Color slate = new Color(0.52f, 0.56f, 0.64f);
-        int seed = 9;
-        for (float x = -22f; x < 22f; x += 2.4f)
+        // a young capital at dusk: the low hills of Gërmia, tall blocks of flats, the boulevard with its lamps,
+        // and in front of the player the NEWBORN letters, the National Library with its domes and net, a minaret and the cathedral tower
+        for (int i = 0; i < 5; i++) Mountain(p, -32f + i * 16f, 38f, 12f + (i % 2) * 3f, new Color(0.20f, 0.20f, 0.34f), false);
+
+        Color[] paint =
         {
-            float w = 1.8f + (float)rng.NextDouble() * 0.6f;
-            float h = 2.0f + (float)rng.NextDouble() * 1.7f;
-            House(p, L, x, 11.2f, w, h, 1.9f, Theme.Stone, seed % 3 == 0 ? new Color(0.78f, 0.78f, 0.82f) : Color.white, Theme.RoofTile, slate, 1, seed++, 0.2f);
+            new Color(0.96f, 0.92f, 0.84f), new Color(0.80f, 0.82f, 0.86f), new Color(0.94f, 0.78f, 0.52f),
+            new Color(0.66f, 0.78f, 0.90f), new Color(0.88f, 0.60f, 0.48f), new Color(0.76f, 0.86f, 0.74f)
+        };
+        Color flat = new Color(0.45f, 0.45f, 0.50f);
+        int seed = 31;
+
+        // the tall blocks behind
+        for (float x = -24f; x < 24f; x += 3.4f)
+        {
+            float w = 2.6f + (float)rng.NextDouble() * 0.7f;
+            float h = 5.5f + (float)rng.NextDouble() * 3.5f;
+            House(p, L, x, 16.5f, w, h, 2.4f, Theme.Plaster, paint[seed % paint.Length], Theme.RoofTile, flat, 2, seed++, 0.6f);
         }
-        for (float x = -21f; x < 21f; x += 3.3f)
+        // the lower buildings along the boulevard (with a gap for the library in front of the player)
+        for (float x = -22f; x < 22f; x += 2.7f)
         {
-            if (x > -10f && x < -0.5f) continue;
-            float w = 2.4f + (float)rng.NextDouble() * 0.8f;
-            float h = 3.4f + (float)rng.NextDouble() * 1.8f;
-            House(p, L, x, 13.4f, w, h, 1.9f, Theme.Stone, seed % 2 == 0 ? Color.white : new Color(0.80f, 0.80f, 0.84f), Theme.RoofTile, slate, 1, seed++, 1.8f);
+            if (_face == 0 && x > 3.5f && x < 14.5f) continue;
+            float w = 2.0f + (float)rng.NextDouble() * 0.6f;
+            float h = 2.2f + (float)rng.NextDouble() * 1.6f;
+            House(p, L, x, 11.8f, w, h, 1.9f, Theme.Plaster, paint[(seed + 3) % paint.Length], Theme.RoofTile, flat, 2, seed++, 0.9f);
         }
 
-        // fortress and clock tower (only in front of the player)
+        // the street lamps of the boulevard
+        Material iron = Mats.Lit(new Color(0.12f, 0.12f, 0.14f), 0.4f, 0.3f);
+        Material globe = Mats.Unlit(new Color(1f, 0.90f, 0.62f));
+        for (int i = -6; i <= 6; i++)
+        {
+            if (i == 0) continue;
+            float x = i * 3.4f;
+            Bx(p, PrimitiveType.Cylinder, x, 1.3f, 8.4f, 0.08f, 1.3f, 0.08f, iron, "LampPost");
+            Bx(p, PrimitiveType.Sphere, x, 2.72f, 8.4f, 0.34f, 0.34f, 0.34f, globe, "LampGlobe");
+        }
+
         if (_face != 0) return;
-        Castle(p, -7.5f, 3.4f, 15.5f, 1.6f, new Color(0.90f, 0.90f, 0.92f));
-        Bx(p, PrimitiveType.Cube, -2.2f, 3.4f, 14.2f, 1.5f, 6.8f, 1.5f, Surf(Theme.Stone, new Color(0.95f, 0.95f, 0.98f), 1.5f, 6.8f, 1.6f, 0.05f), "ClockTower");
-        Cn(p, -2.2f, 7.5f, 14.2f, 1.5f, 1.4f, 1.5f, Mats.Lit(new Color(0.40f, 0.20f, 0.18f), 0.2f), "TowerRoof");
-        Bx(p, PrimitiveType.Sphere, -2.2f, 5.8f, 13.4f, 0.9f, 0.9f, 0.05f, Mats.Unlit(Theme.Cream), "ClockFace");
-        Wq(p, -2.2f, 5.8f, 13.36f, 0.07f, 0.55f, Mats.Unlit(Theme.Black));
-        Wq(p, -2.2f, 5.75f, 13.35f, 0.4f, 0.07f, Mats.Unlit(Theme.Black));
+
+        // NEWBORN: the big yellow letters, put up the day Kosovo declared independence
+        Newborn(p, -13.2f, 10.4f, 1.15f, 1.7f, 0.35f);
+
+        // the National Library: white blocks under a metal net, with domes of every size on the roof
+        float lx = 9f, lz = 14.2f, lw = 8.6f, lh = 3.8f, ld = 4f;
+        Material libWall = Surf(Theme.Plaster, new Color(0.92f, 0.92f, 0.90f), lw, lh, 2.2f);
+        Material dome = Mats.Lit(new Color(0.90f, 0.90f, 0.88f), 0.35f);
+        Material net = Mats.Unlit(new Color(0.26f, 0.27f, 0.30f));
+        Material glass = Mats.Unlit(new Color(1f, 0.82f, 0.48f));
+        Bx(p, PrimitiveType.Cube, lx, lh * 0.5f, lz, lw, lh, ld, libWall, "Library");
+        Bx(p, PrimitiveType.Cube, lx - lw * 0.32f, lh + 0.6f, lz + 0.3f, 2.4f, 1.2f, 2.6f, libWall, "LibraryBlock");
+        Bx(p, PrimitiveType.Cube, lx + lw * 0.30f, lh + 0.45f, lz + 0.2f, 2.2f, 0.9f, 2.4f, libWall, "LibraryBlock");
+        float fz = lz - ld * 0.5f - 0.03f;
+        for (int i = 0; i < 9; i++)                                  // a band of lit windows behind the net
+            Wq(p, lx - lw * 0.5f + 0.6f + i * (lw - 1.2f) / 8f, lh * 0.55f, fz + 0.01f, 0.45f, 0.9f, glass);
+        for (float x = lx - lw * 0.5f + 0.3f; x < lx + lw * 0.5f; x += 0.55f)
+            Wq(p, x, lh * 0.5f, fz - 0.01f, 0.05f, lh, net);
+        for (float y = 0.3f; y < lh; y += 0.55f)
+            Wq(p, lx, y, fz - 0.02f, lw, 0.05f, net);
+        Bx(p, PrimitiveType.Sphere, lx, lh, lz, 3.0f, 2.4f, 3.0f, dome, "BigDome");
+        for (int i = 0; i < 12; i++)
+        {
+            float dx = (i % 6) / 5f - 0.5f, dz = i < 6 ? -0.3f : 0.3f;
+            if (Mathf.Abs(dx) < 0.18f) continue;                    // the big dome is in the middle
+            float s = 0.8f + (float)rng.NextDouble() * 0.8f;
+            Bx(p, PrimitiveType.Sphere, lx + dx * (lw - 1.4f), lh, lz + dz * ld, s, s * 0.9f, s, dome, "Dome");
+        }
+
+        // the minaret of an old mosque, rising above the boulevard
+        Material white = Mats.Lit(new Color(0.96f, 0.94f, 0.90f), 0.2f);
+        Material lead = Mats.Lit(new Color(0.42f, 0.46f, 0.52f), 0.4f, 0.3f);
+        Bx(p, PrimitiveType.Cylinder, 2.4f, 3.8f, 13.4f, 0.4f, 3.8f, 0.4f, white, "Minaret");
+        Bx(p, PrimitiveType.Cylinder, 2.4f, 6.4f, 13.4f, 0.6f, 0.07f, 0.6f, globe, "Balcony");
+        Cn(p, 2.4f, 8.2f, 13.4f, 0.42f, 1.0f, 0.42f, lead, "MinaretTop");
+
+        // the bell tower of the cathedral of Mother Teresa
+        Material cathedral = Surf(Theme.Plaster, new Color(0.98f, 0.92f, 0.82f), 1.6f, 10f, 2f);
+        Bx(p, PrimitiveType.Cube, -1.6f, 5.2f, 15.4f, 1.6f, 10.4f, 1.6f, cathedral, "BellTower");
+        Cn(p, -1.6f, 11.4f, 15.4f, 1.7f, 2.0f, 1.7f, Mats.Lit(new Color(0.30f, 0.44f, 0.48f), 0.3f, 0.2f), "Spire");
+        Wq(p, -1.6f, 8.6f, 14.58f, 0.5f, 1.2f, glass);
+        Bx(p, PrimitiveType.Sphere, -1.6f, 9.2f, 14.58f, 0.5f, 0.5f, 0.03f, glass, "BelfryArch");
+    }
+
+    /// <summary>The NEWBORN letters, each built from yellow blocks along its strokes.</summary>
+    static void Newborn(Transform p, float x0, float z, float w, float h, float gap)
+    {
+        // each letter as strokes in a unit box (x, y from 0 to 1)
+        float[][] N = { new[] { 0f, 0f, 0f, 1f }, new[] { 1f, 0f, 1f, 1f }, new[] { 0f, 1f, 1f, 0f } };
+        float[][] E = { new[] { 0f, 0f, 0f, 1f }, new[] { 0f, 1f, 1f, 1f }, new[] { 0f, 0.5f, 0.8f, 0.5f }, new[] { 0f, 0f, 1f, 0f } };
+        float[][] W = { new[] { 0f, 0f, 0f, 1f }, new[] { 1f, 0f, 1f, 1f }, new[] { 0f, 0f, 0.5f, 0.6f }, new[] { 0.5f, 0.6f, 1f, 0f } };
+        float[][] B = { new[] { 0f, 0f, 0f, 1f }, new[] { 0f, 1f, 0.85f, 1f }, new[] { 0.85f, 1f, 0.85f, 0.5f }, new[] { 0f, 0.5f, 1f, 0.5f }, new[] { 1f, 0.5f, 1f, 0f }, new[] { 0f, 0f, 1f, 0f } };
+        float[][] O = { new[] { 0f, 0f, 0f, 1f }, new[] { 1f, 0f, 1f, 1f }, new[] { 0f, 1f, 1f, 1f }, new[] { 0f, 0f, 1f, 0f } };
+        float[][] R = { new[] { 0f, 0f, 0f, 1f }, new[] { 0f, 1f, 1f, 1f }, new[] { 1f, 1f, 1f, 0.5f }, new[] { 0f, 0.5f, 1f, 0.5f }, new[] { 0.35f, 0.5f, 1f, 0f } };
+        float[][][] word = { N, E, W, B, O, R, N };
+
+        Material yellow = Mats.Lit(new Color(1f, 0.80f, 0.12f), 0.35f);
+        float t = h * 0.17f, depth = 0.45f;
+        for (int li = 0; li < word.Length; li++)
+        {
+            float lx = x0 + li * (w + gap);
+            foreach (float[] s in word[li])
+            {
+                var a = new Vector2(lx + t * 0.5f + s[0] * (w - t), t * 0.5f + s[1] * (h - t));
+                var b = new Vector2(lx + t * 0.5f + s[2] * (w - t), t * 0.5f + s[3] * (h - t));
+                Vector2 d = b - a;
+                Vector2 m = (a + b) * 0.5f;
+                Tilted(p, PrimitiveType.Cube, m.x, m.y, z, d.magnitude + t, t, depth, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg, yellow, "Letter");
+            }
+        }
     }
 
     void BuildTirane(Transform p, Theme.CityLook L, System.Random rng)
@@ -814,7 +898,7 @@ public partial class Game3D
     }
 
     // ---------------------------------------------------------------------------------------
-    // the coast and the mountains
+    // the coast
     // ---------------------------------------------------------------------------------------
 
     void BuildSarande(Transform p, Theme.CityLook L, System.Random rng)
@@ -877,43 +961,141 @@ public partial class Game3D
         }
     }
 
-    void BuildTheth(Transform p, Theme.CityLook L, System.Random rng)
+    void BuildUlqin(Transform p, Theme.CityLook L, System.Random rng)
     {
-        // the Albanian Alps at dawn: snow peaks, pine forests, the stone tower (kulla), wooden chalets
-        float[] fx = { -30f, -14f, 4f, 21f, 38f };
-        float[] fs = { 20f, 24f, 19f, 25f, 20f };
-        for (int i = 0; i < fx.Length; i++) Mountain(p, fx[i], 38f, fs[i], new Color(0.30f, 0.36f, 0.50f), true);
-        float[] nx = { -22f, -6f, 12f, 28f };
-        float[] ns = { 15f, 14f, 16f, 13f };
-        for (int i = 0; i < nx.Length; i++)
+        // the final: the Adriatic by moonlight, the old town (Kalaja) on its rock, the new town on the hills with its minarets,
+        // a corsair ship at anchor (Ulqin was a pirate port) and the square fishing nets (kalimera) of the Buna
+        Prim.FlatQuad(p, new Vector3(0f, 0.01f, 36f), 170f, 56f, new Color(0.03f, 0.10f, 0.20f), null, true).name = "Sea";
+        for (int i = 0; i < 7; i++)
         {
-            Tilted(p, PrimitiveType.Cube, nx[i], 0f, 25f, ns[i], ns[i], 6f, 45f, Surf(Theme.Stone, new Color(0.50f, 0.56f, 0.64f), ns[i], ns[i], 3.5f, 0.05f), "Crag");
+            float z = 12f + i * i * 0.6f + i * 1.4f;
+            Prim.FlatQuad(p, new Vector3(0f, 0.02f + i * 0.001f, z), 170f, 0.25f + i * 0.06f, Color.Lerp(new Color(0.06f, 0.18f, 0.30f), new Color(0.18f, 0.30f, 0.44f), i / 6f), null, true).name = "SeaBand";
         }
+        // the beach in front of the terrace
+        Prim.FlatQuad(p, new Vector3(0f, 0.015f, 8.9f), 80f, 1.8f, new Color(0.62f, 0.56f, 0.46f), null, true).name = "Beach";
 
-        // forest in front of the crags
-        for (int i = 0; i < 26; i++)
-            Pine(p, -24f + i * 1.9f + (float)rng.NextDouble() * 1.2f, 17.5f + (float)rng.NextDouble() * 2.5f, 3.2f + (float)rng.NextDouble() * 2.0f, new Color(0.06f + (float)rng.NextDouble() * 0.03f, 0.22f, 0.14f));
-
-        // the kulla: a square stone tower (only in front of the player)
+        Material moonM = Mats.Unlit(new Color(0.97f, 0.95f, 0.86f));
         if (_face == 0)
         {
-        Bx(p, PrimitiveType.Cube, -5.5f, 3.4f, 13.0f, 2.6f, 6.8f, 2.4f, Surf(Theme.Stone, new Color(0.95f, 0.93f, 0.9f), 2.6f, 6.8f, 1.5f, 0.05f), "Kulla");
-        Bx(p, PrimitiveType.Cube, -5.5f, 5.0f, 11.78f, 2.9f, 0.12f, 0.5f, Surf(Theme.Wood, new Color(0.7f, 0.55f, 0.4f), 2.9f, 0.12f, 1.2f), "Balcony");
-        Cn(p, -5.5f, 7.9f, 13.0f, 3.5f, 1.6f, 3.4f, Mats.LitTex(new Color(0.55f, 0.58f, 0.66f), Theme.RoofTile, 2f, 1f, 0.2f), "KullaRoof");
-        for (int j = 0; j < 4; j++)
-            Wq(p, -5.5f + (j % 2 == 0 ? -0.5f : 0.5f), 2.2f + (j / 2) * 2.0f, 11.78f, 0.22f, 0.5f, Mats.Unlit(new Color(0.05f, 0.05f, 0.08f)));
+            // the full moon low over the sea, and its silver path on the water
+            Bx(p, PrimitiveType.Sphere, 5f, 8.5f, 58f, 5.2f, 5.2f, 0.2f, moonM, "Moon");
+            Bx(p, PrimitiveType.Sphere, 5f, 8.5f, 59f, 10f, 10f, 0.2f, Mats.Unlit(new Color(0.55f, 0.66f, 0.80f, 0.35f)), "MoonGlow");
+            Prim.FlatQuad(p, new Vector3(5f, 0.03f, 32f), 2.2f, 40f, new Color(0.85f, 0.88f, 0.90f, 0.5f), null, true).name = "MoonPath";
+        }
+        else if (_face != 2)
+            Bx(p, PrimitiveType.Sphere, -12f, 14f, 48f, 1.2f, 1.2f, 0.2f, moonM, "Venus");
+
+        // the new town: white houses with red tiles on the hills either side of the bay
+        Color tile = new Color(0.86f, 0.42f, 0.30f);
+        int seed = 51;
+        for (int side = -1; side <= 1; side += 2)
+        {
+            Mountain(p, side * 27f, 30f, 17f, new Color(0.10f, 0.14f, 0.22f), false);
+            if (_face == 0 && side < 0) continue;                    // the rock of the old town stands there
+            for (int row = 0; row < 4; row++)
+            {
+                float z = 10.8f + row * 1.0f;
+                float baseH = 1.0f + row * 0.9f;
+                float x = side * (7.0f + row * 0.6f);
+                for (int k = 0; k < 7; k++)
+                {
+                    float w = 1.4f + (float)rng.NextDouble() * 0.9f;
+                    float h = baseH + (float)rng.NextDouble() * 0.7f;
+                    float cx = x + side * (k * 2.05f + w * 0.5f);
+                    House(p, L, cx, z, w, h, 1.0f, Theme.Plaster, k % 4 == 0 ? new Color(0.92f, 0.86f, 0.74f) : Color.white, Theme.RoofTile, tile, 1, seed++, 0.2f);
+                }
+            }
+            // minarets among the houses
+            for (int m = 0; m < 2; m++)
+                Minaret(p, side * (10.5f + m * 6.5f), 13.6f + m * 0.8f, 5.6f + m * 0.8f);
         }
 
-        // wooden chalets with steep roofs
-        for (int i = 0; i < 5; i++)
+        if (_face == 0)
         {
-            float cx = 3f + i * 3.6f;
-            float w = 2.4f + (i % 2) * 0.6f, h = 1.9f + (i % 3) * 0.3f;
-            House(p, L, cx, 11.4f + (i % 2) * 1.2f, w, h, 1.8f, Theme.Wood, new Color(0.95f, 0.78f, 0.62f), Theme.RoofTile, new Color(0.62f, 0.45f, 0.38f), 1, 40 + i, 0.3f);
+            // Kalaja: the old town on a rock that falls into the sea, walled, with the tower of the Balshajs
+            Material rock = Surf(Theme.Stone, new Color(0.55f, 0.52f, 0.50f), 12f, 3.4f, 3f, 0.05f);
+            Color stone = new Color(0.88f, 0.82f, 0.72f);
+            Bx(p, PrimitiveType.Cube, -11.5f, 1.7f, 17.5f, 12f, 3.4f, 7f, rock, "Rock");
+            Bx(p, PrimitiveType.Sphere, -5.6f, 0.6f, 16.5f, 4f, 3.6f, 6f, rock, "RockEnd");
+            Bx(p, PrimitiveType.Sphere, -11.5f, 0.3f, 14.2f, 12f, 2.2f, 2.2f, rock, "RockFoot");
+            Castle(p, -11.5f, 3.4f, 14.6f, 1.15f, stone);
+            for (int i = 0; i < 6; i++)                               // stone houses inside the walls, rising over them
+            {
+                float w = 1.5f + (float)rng.NextDouble() * 0.6f;
+                float h = 5.2f + (float)rng.NextDouble() * 1.4f;
+                House(p, L, -15.5f + i * 1.75f, 16.8f + (i % 2) * 1.2f, w, h, 1.4f, Theme.Stone, Color.Lerp(stone, Color.white, 0.2f), Theme.RoofTile, tile, 1, seed++, 4.6f);
+            }
+            Material tower = Surf(Theme.Stone, stone, 1.8f, 8f, 1.6f, 0.05f);
+            Bx(p, PrimitiveType.Cube, -16.8f, 4.1f, 15.6f, 1.8f, 8.2f, 1.8f, tower, "BalshaTower");
+            for (int i = 0; i < 4; i++)
+                Bx(p, PrimitiveType.Cube, -17.5f + i * 0.47f, 8.4f, 14.8f, 0.3f, 0.36f, 0.3f, tower, "Merlon");
+            Wq(p, -16.8f, 6.6f, 14.68f, 0.24f, 0.5f, Mats.Unlit(L.Window));
+            // the lights of the old town shimmer on the water below
+            for (int i = 0; i < 5; i++)
+                Prim.FlatQuad(p, new Vector3(-14.5f + i * 1.6f, 0.035f, 12.2f + (i % 2) * 0.6f), 0.4f, 2.4f, new Color(1f, 0.74f, 0.36f, 0.45f), null, true).name = "Glimmer";
+
+            // a corsair ship at anchor: dark hull, two masts, dark sails and a lantern at the stern
+            Material hull = Mats.Lit(new Color(0.20f, 0.12f, 0.08f), 0.2f);
+            Material sail = Mats.Lit(new Color(0.16f, 0.14f, 0.16f), 0.05f);
+            float sx = 9f, sz = 26f;
+            Bx(p, PrimitiveType.Cube, sx, 0.5f, sz, 5.2f, 1.0f, 1.5f, hull, "Hull");
+            Bx(p, PrimitiveType.Cube, sx + 2.3f, 1.2f, sz, 1.2f, 0.7f, 1.5f, hull, "Stern");
+            Tilted(p, PrimitiveType.Cube, sx - 3.2f, 1.1f, sz, 1.8f, 0.1f, 0.1f, 18f, hull, "Bowsprit");
+            for (int m = 0; m < 2; m++)
+            {
+                float mx = sx - 1.3f + m * 2.2f;
+                Bx(p, PrimitiveType.Cylinder, mx, 3.4f, sz, 0.09f, 2.9f, 0.09f, hull, "Mast");
+                Bx(p, PrimitiveType.Cube, mx, 3.6f, sz - 0.1f, 1.8f, 2.6f, 0.03f, sail, "Sail");
+                Bx(p, PrimitiveType.Cube, mx, 5.4f, sz - 0.1f, 1.3f, 0.9f, 0.03f, sail, "TopSail");
+            }
+            Bx(p, PrimitiveType.Sphere, sx + 2.9f, 1.8f, sz - 0.4f, 0.3f, 0.36f, 0.3f, Mats.Unlit(L.Window), "ShipLantern");
         }
-        // a low stone wall and a wooden fence at the front of the terrace
-        Bx(p, PrimitiveType.Cube, 0f, 0.4f, 7.5f, 60f, 0.8f, 0.5f, Surf(Theme.Stone, new Color(0.9f, 0.88f, 0.84f), 60f, 0.8f, 1.6f, 0.05f), "StoneWall");
-        // the first light of the day on the snow
-        if (_face == 0) Bx(p, PrimitiveType.Sphere, 12f, 5.5f, 50f, 5f, 5f, 0.2f, Mats.Unlit(new Color(1f, 0.93f, 0.78f)), "Dawn");
+        else if (_face != 2)
+        {
+            // the kalimera: a wooden hut on stilts over the water, with a big square net hanging from a boom
+            Kalimera(p, -9f, 13.5f);
+            Kalimera(p, 11f, 15f);
+        }
+
+        // palms along the beach
+        for (int i = -3; i <= 3; i++)
+        {
+            if (i == 0) continue;
+            Palm(p, i * 5.0f + 1.0f, 8.6f, 3.2f + (Mathf.Abs(i) % 3) * 0.5f, (i % 2 == 0 ? 0.3f : -0.3f));
+        }
+    }
+
+    /// <summary>A white minaret with a lit balcony and a pointed lead roof.</summary>
+    static void Minaret(Transform p, float x, float z, float h)
+    {
+        Material white = Mats.Lit(new Color(0.95f, 0.93f, 0.88f), 0.2f);
+        Bx(p, PrimitiveType.Cylinder, x, h * 0.5f, z, 0.34f, h * 0.5f, 0.34f, white, "Minaret");
+        Bx(p, PrimitiveType.Cylinder, x, h * 0.78f, z, 0.54f, 0.06f, 0.54f, Mats.Unlit(new Color(1f, 0.84f, 0.50f)), "Balcony");
+        Cn(p, x, h + 0.45f, z, 0.36f, 0.9f, 0.36f, Mats.Lit(new Color(0.42f, 0.46f, 0.52f), 0.4f, 0.3f), "MinaretTop");
+    }
+
+    /// <summary>A fishing hut on stilts with a square net hung from a long boom over the water (the kalimera of the Buna).</summary>
+    static void Kalimera(Transform p, float x, float z)
+    {
+        Material wood = Surf(Theme.Wood, new Color(0.62f, 0.46f, 0.32f), 2.4f, 1.6f, 1.2f, 0.2f);
+        Material pole = Mats.Lit(new Color(0.30f, 0.20f, 0.12f), 0.1f);
+        Material rope = Mats.Unlit(new Color(0.55f, 0.50f, 0.42f));
+        for (int i = 0; i < 4; i++)
+            Bx(p, PrimitiveType.Cylinder, x + (i % 2 == 0 ? -0.9f : 0.9f), 0.8f, z + (i < 2 ? -0.6f : 0.6f), 0.1f, 0.8f, 0.1f, pole, "Stilt");
+        Bx(p, PrimitiveType.Cube, x, 2.4f, z, 2.4f, 1.6f, 1.6f, wood, "Hut");
+        Tilted(p, PrimitiveType.Cube, x, 3.2f, z, 1.75f, 1.75f, 1.5f, 45f, Mats.Lit(new Color(0.40f, 0.30f, 0.22f), 0.1f), "HutRoof");
+        Wq(p, x, 2.4f, z - 0.82f, 0.4f, 0.5f, Mats.Unlit(new Color(1f, 0.78f, 0.40f)));
+
+        // the boom leans out to one side, and the net hangs from its end
+        float dir = x < 0f ? 1f : -1f;
+        float ex = x + dir * 4.2f;
+        Tilted(p, PrimitiveType.Cube, x + dir * 2.1f, 3.6f, z - 0.2f, 4.6f, 0.08f, 0.08f, dir * 22f, pole, "Boom");
+        float top = 4.6f, size = 2.6f;
+        for (int i = 0; i <= 5; i++)
+        {
+            float k = i / 5f;
+            Wq(p, ex - size * 0.5f + k * size, top - size * 0.5f, z - 0.3f, 0.03f, size, rope);
+            Wq(p, ex, top - k * size, z - 0.3f, size, 0.03f, rope);
+        }
     }
 }

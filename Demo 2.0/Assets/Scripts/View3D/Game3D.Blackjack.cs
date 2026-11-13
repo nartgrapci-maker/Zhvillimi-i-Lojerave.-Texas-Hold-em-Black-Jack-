@@ -416,7 +416,7 @@ public partial class Game3D
             {
                 _bjStageWon = true;
                 bool last = _bjStage >= BjTourGoal.Length - 1;
-                msg += last ? "\n<b>Fitove turin e Blackjack-ut! Je kampion i Shqipërisë.</b>"
+                msg += last ? "\n<b>Fitove turin e Blackjack-ut! Je kampion i trojeve shqiptare.</b>"
                             : "\n<b>" + Sq.Cities[_bjStage].Name + " u fitua!</b> Vazhdo te " + Sq.Cities[_bjStage + 1].Name + ".";
                 AddLog("<color=#7CFC9A><b>Qëllimi u arrit: " + _bt.Chips + " " + Sq.Currency + ".</b></color>");
                 Play(Sfx.Win, 0.8f);

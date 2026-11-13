@@ -322,7 +322,7 @@ public static class Art
         return px;
     }
 
-    /// <summary>Courses of rough stone blocks with grey mortar between them (Gjirokastër, the castles, the tower of Theth).</summary>
+    /// <summary>Courses of rough stone blocks with grey mortar between them (the castles, the old town of Ulqin).</summary>
     public static byte[] StoneRGBA(int n)
     {
         var px = new byte[n * n * 4];

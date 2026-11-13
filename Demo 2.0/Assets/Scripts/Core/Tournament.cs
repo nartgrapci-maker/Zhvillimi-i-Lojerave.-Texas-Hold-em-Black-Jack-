@@ -12,7 +12,7 @@ namespace PokerDemo.Core
 
     /// <summary>
     /// The tournament "Udhetimi nepër Shqipëri": seven stages in the order of the city wheel (Oda e burrave, Shkodër,
-    /// Berat, Gjirokastër, Tiranë, Sarandë, Theth), each against three new opponents who play harder than the stage
+    /// Berat, Prishtinë, Tiranë, Sarandë, Ulqin), each against three new opponents who play harder than the stage
     /// before (they bluff more, make fewer random mistakes, and the last stages start them with more chips).
     /// Stage s is played on map s - 1 (map -1 is the oda).
     /// </summary>
@@ -61,10 +61,10 @@ namespace PokerDemo.Core
                 },
                 BotStack = 200
             },
-            // 4 Gjirokastër: tough and aggressive
+            // 4 Prishtinë: young, tough and aggressive
             new StageDef
             {
-                BotNames = new string[] { "Skënder", "Vjollca", "Gjergj" },
+                BotNames = new string[] { "Driton", "Albulena", "Fatmir" },
                 Bots = new BotPersonality[]
                 {
                     P("Calculating", 0.60, 0.65, 0.08, 0.05),
@@ -97,10 +97,10 @@ namespace PokerDemo.Core
                 },
                 BotStack = 230
             },
-            // 7 Theth: the final, high in the Alps, the best bots and the biggest stacks
+            // 7 Ulqin: the final, in the old town above the Adriatic, the best bots and the biggest stacks
             new StageDef
             {
-                BotNames = new string[] { "Gjon", "Mrika", "Prenk" },
+                BotNames = new string[] { "Hasan", "Merita", "Ismet" },
                 Bots = new BotPersonality[]
                 {
                     P("Calculating", 0.64, 0.74, 0.11, 0.02),
