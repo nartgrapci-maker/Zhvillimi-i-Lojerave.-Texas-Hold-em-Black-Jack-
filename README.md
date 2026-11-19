@@ -22,3 +22,6 @@ Komponentët logjikë dhe algoritmikë të projektit:
 - vlerësuesi i duarve (dora më e mirë prej 5 letrave nga 7)
 - simulim Monte Carlo për gjasat e fitores
 - vlera e pritur dhe pot odds për vendimet
+
+## Ndarja e taskave ne grup
+https://claude.ai/artifact/XXhmbA1nej77RrLmJsDrqe
